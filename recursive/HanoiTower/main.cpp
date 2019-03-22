@@ -1,7 +1,7 @@
-#define LAB
-
 #include <iostream>
 #include <vector>
+#include <chrono>
+#include <thread>
 #include "SDL_utils.h"
 #include <SDL.h>
 
@@ -12,12 +12,14 @@ vector<int> column[SIZE];
 SDL_Window* window;
 SDL_Renderer* renderer;
 
-const int SCREEN_WIDTH = 900;
-const int SCREEN_HEIGHT = 600;
+const int SCREEN_WIDTH = 600;
+const int SCREEN_HEIGHT = 400;
 const char WINDOW_TITLE[] = "Hanoi Tower";
 
+#define STEP 5
 #define CELL 20
 #define GAP 10
+#define STICK_WIDTH 6
 const int COLUMN_WIDTH = SCREEN_WIDTH / 3;
 const int COLUMN_OFFSET = SCREEN_WIDTH / 6;
 
@@ -29,50 +31,93 @@ void drawDisk(int size, int x, int y)
 {
     SDL_Rect filled_rect;
     filled_rect.x = x - size*CELL/2;
-    filled_rect.y = y;
+    filled_rect.y = y - CELL;
     filled_rect.w = size * CELL;
     filled_rect.h = CELL;
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // green
     SDL_RenderFillRect(renderer, &filled_rect);
 }
 
+int getColumnY(int level)
+{
+    return BASE_Y - level *(CELL + GAP);
+}
+
 void drawColumn(vector<int> column, int x)
 {
     SDL_Rect filled_rect;
-    filled_rect.x = x;
+    filled_rect.x = x - STICK_WIDTH/2;
     filled_rect.y = TOP_Y;
-    filled_rect.w = 10;
+    filled_rect.w = STICK_WIDTH;
     filled_rect.h = COLUMN_HEIGHT;
     SDL_SetRenderDrawColor(renderer, 0, 255, 255, 255);
     SDL_RenderFillRect(renderer, &filled_rect);
 
     for (int i = 0; i < column.size(); i++) {
-        drawDisk(column[i], x, BASE_Y - i*(CELL + GAP));
+        drawDisk(column[i], x, getColumnY(i));
     }
 }
 
-void display(int disk, int source, int dest)
+void draw_screen(int disk, int x, int y)
 {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-    drawDisk(disk, 10, 10);
-    //cout << disk << " from " << source << " -> " << dest << endl;
+
     for (int col = 0; col < 3; col ++) {
         drawColumn(column[col], COLUMN_OFFSET + COLUMN_WIDTH*col);
     }
+    drawDisk(disk, x, y);
+
 #ifndef LAB
     SDL_RenderPresent(renderer);
 #else
     SDL_UpdateWindowSurface(window);
 #endif // LAB
-    waitUntilKeyPressed();
+    this_thread::sleep_for(chrono::milliseconds(25));
+}
+
+int getColumnX(int column)
+{
+    return COLUMN_OFFSET + COLUMN_WIDTH*column;
+}
+
+void move(int disk, int source, int dest)
+{
+    int x = getColumnX(source);
+    int y = getColumnY(column[source].size());
+    int end_x = getColumnX(dest);
+    int end_y = getColumnY(column[dest].size());
+
+    int ceiling_y = TOP_Y;
+    //moveup
+    while (y > ceiling_y) {
+        draw_screen(disk, x, y);
+        y-=STEP;
+    }
+    //move left
+    while (x > end_x) {
+        draw_screen(disk, x, y);
+        x-=STEP;
+    }
+    //move right
+    while (x < end_x) {
+        draw_screen(disk, x, y);
+        x+=STEP;
+    }
+    x = end_x;
+    //move down
+    while (y < end_y) {
+        draw_screen(disk, x, y);
+        y+=STEP;
+    }
+    draw_screen(disk, x, end_y);
 }
 
 void move(int source, int dest)
 {
     int disk = column[source].back();
     column[source].pop_back();
-    display(disk, source, dest);
+    move(disk, source, dest);
     column[dest].push_back(disk);
 }
 
