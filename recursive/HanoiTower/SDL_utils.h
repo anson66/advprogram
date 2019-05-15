@@ -1,4 +1,4 @@
-#define LAB
+//#define LAB
 
 #ifndef SDL_UTILS__H
 #define SDL_UTILS__H

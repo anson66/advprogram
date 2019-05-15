@@ -32,7 +32,7 @@ void initSDL(SDL_Window* &window, SDL_Renderer* &renderer,
                                               SDL_RENDERER_PRESENTVSYNC);
 #else
     //Khi chạy ở máy thực hành WinXP ở trường (máy ảo)
-    renderer = SDL_CreateSoftwareRenderer(SDL_GetWindowSurface(window));
+    //renderer = SDL_CreateSoftwareRenderer(SDL_GetWindowSurface(window));
 #endif // LAB
 
     if (renderer == nullptr) logSDLError(std::cout, "CreateRenderer", true);

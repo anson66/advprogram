@@ -71,9 +71,9 @@ void draw_screen(int disk, int x, int y)
 #ifndef LAB
     SDL_RenderPresent(renderer);
 #else
-    SDL_UpdateWindowSurface(window);
+    //SDL_UpdateWindowSurface(window);
 #endif // LAB
-    this_thread::sleep_for(chrono::milliseconds(25));
+    this_thread::sleep_for(chrono::milliseconds(100));
 }
 
 int getColumnX(int column)
