@@ -12,8 +12,7 @@ int main ()
         count[word] += 1;
     }
 
-    map<string, int>::iterator i;
-    for (i = count.begin(); i != count.end(); i++) {
+    for (map<string, int>::iterator i = count.begin(); i != count.end(); i++) {
         cout << i->first << ":" << i->second << endl;
     }
 

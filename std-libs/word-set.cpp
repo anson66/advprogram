@@ -12,8 +12,7 @@ int main ()
         word_set.insert(word);
     }
 
-    set<string>::iterator i;
-    for (i = word_set.begin(); i != word_set.end(); i++)
+    for (set<string>::iterator i = word_set.begin(); i != word_set.end(); i++)
         cout << *i << endl;
 
     //C++11
